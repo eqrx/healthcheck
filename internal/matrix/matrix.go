@@ -60,14 +60,16 @@ func Connect(ctx context.Context, serverName string, addr string) error {
 		return fmt.Errorf("could not execute http request: %w", err)
 	}
 
-	body, err := ioutil.ReadAll(response.Body)
+	body, readErr := ioutil.ReadAll(response.Body)
+	closeErr := response.Body.Close()
 
-	if err := response.Body.Close(); err != nil {
-		return fmt.Errorf("could not close http response body: %w", err)
-	}
-
-	if err != nil {
-		return fmt.Errorf("could not read http body: %w", err)
+	switch {
+	case readErr != nil && closeErr != nil:
+		return fmt.Errorf("could not read http body: %w. could also not close it afterwards: %v", readErr, closeErr)
+	case readErr != nil:
+		return fmt.Errorf("could not read http body: %w", readErr)
+	case closeErr != nil:
+		return fmt.Errorf("could not close http response body: %w", closeErr)
 	}
 
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
@@ -84,7 +86,7 @@ func Connect(ctx context.Context, serverName string, addr string) error {
 // ResolveV6 resolves the IPv6 address of the matrix server responsible for the given domain.
 // Is does so by searching for the DNS SRV _matrix._tcp.$domain and returning the first IPv6 address.
 func ResolveV6(ctx context.Context, domain string) (string, string, error) {
-	name := fmt.Sprintf("_matrix._tcp.%v", domain)
+	name := fmt.Sprintf("_matrix._tcp.%s", domain)
 
 	hostname, addr, err := resolve.Pointer(ctx, name, dns.TypeSRV, dns.TypeAAAA)
 	if err != nil {
@@ -97,7 +99,7 @@ func ResolveV6(ctx context.Context, domain string) (string, string, error) {
 // ResolveV4 resolves the IPv4 address of the matrix server responsible for the given domain.
 // Is does so by searching for the DNS SRV _matrix._tcp.$domain and returning the first IPv4 address.
 func ResolveV4(ctx context.Context, domain string) (string, string, error) {
-	name := fmt.Sprintf("_matrix._tcp.%v", domain)
+	name := fmt.Sprintf("_matrix._tcp.%s", domain)
 
 	hostname, addr, err := resolve.Pointer(ctx, name, dns.TypeSRV, dns.TypeA)
 	if err != nil {

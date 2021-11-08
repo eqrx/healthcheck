@@ -29,16 +29,16 @@ type (
 	connectorFn func(context.Context, string, string) error
 )
 
-// checkConn resolves an address using the resolverFn resolver, calls connectorFn connection with the
-// result hostname and IP if it succeeded and pings healthchecks.io with key if that succeeds too. After succeeding
+// checkConn resolves an address using the resolverFn resolver, calls connectorFn connection with the domain and
+// result and IP if it succeeded and pings healthchecks.io with key if that succeeds too. After succeeding
 // with that it returns with nil as error. If there is a failure at any point, it returns with an error.
 func checkConn(ctx context.Context, key string, target string, resolver resolverFn, connector connectorFn) error {
-	hostname, addr, err := resolver(ctx, target)
+	_, addr, err := resolver(ctx, target)
 	if err != nil {
 		return fmt.Errorf("resolve failed: %w", err)
 	}
 
-	if err = connector(ctx, hostname, addr); err != nil {
+	if err = connector(ctx, target, addr); err != nil {
 		return fmt.Errorf("connect failed: %w", err)
 	}
 
