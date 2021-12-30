@@ -113,16 +113,11 @@ func Connect(ctx context.Context, serverName string, addr string) error {
 		return nil
 	})
 
-	errs := group.Wait()
-	switch len(errs) {
-	case 0:
-		return nil
-	case 1:
-		return errs[0]
-	default:
-		//nolint: goerr113 // Slice of errors, no wrapping possible or useful.
-		return fmt.Errorf("smtp check run group for serverName %s failed: %v", serverName, errs)
+	if err := group.Wait(); err != nil {
+		return fmt.Errorf("smtp check run group for serverName %s failed: %w", serverName, err)
 	}
+
+	return nil
 }
 
 // ResolveV6 resolves the IPv6 address of the SMTP server responsible for the given domain and
