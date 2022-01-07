@@ -19,9 +19,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/eqrx/healthcheck/internal/ceph"
-	"github.com/eqrx/healthcheck/internal/matrix"
-	"github.com/eqrx/healthcheck/internal/smtp"
+	"dev.eqrx.net/healthcheck/internal/ceph"
+	"dev.eqrx.net/healthcheck/internal/matrix"
+	"dev.eqrx.net/healthcheck/internal/smtp"
 )
 
 // runTimeout defines how much a run of healthcheck may take.

@@ -1,4 +1,4 @@
-[![Go Reference](https://pkg.go.dev/badge/github.com/eqrx/healthcheck.svg)](https://pkg.go.dev/github.com/eqrx/healthcheck)
+[![Go Reference](https://pkg.go.dev/badge/dev.eqrx.net/healthcheck.svg)](https://pkg.go.dev/dev.eqrx.net/healthcheck)
 # healthcheck
 
 Personal collection of checks that I use to monitor my externally reachable services. Results of those checks are 

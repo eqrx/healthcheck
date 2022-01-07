@@ -17,7 +17,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/eqrx/healthcheck/internal/ping"
+	"dev.eqrx.net/healthcheck/internal/ping"
 )
 
 type (

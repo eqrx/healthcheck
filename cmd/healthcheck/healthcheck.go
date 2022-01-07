@@ -20,7 +20,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/eqrx/healthcheck/internal"
+	"dev.eqrx.net/healthcheck/internal"
 	"golang.org/x/sys/unix"
 )
 

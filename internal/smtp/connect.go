@@ -24,8 +24,8 @@ import (
 	"net"
 	"strings"
 
-	"github.com/eqrx/healthcheck/internal/resolve"
-	"github.com/eqrx/rungroup"
+	"dev.eqrx.net/healthcheck/internal/resolve"
+	"dev.eqrx.net/rungroup"
 	"github.com/miekg/dns"
 )
 

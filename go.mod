@@ -1,9 +1,9 @@
-module github.com/eqrx/healthcheck
+module dev.eqrx.net/healthcheck
 
 go 1.17
 
 require (
-	github.com/eqrx/rungroup v0.0.3
+	dev.eqrx.net/rungroup v0.0.4
 	github.com/miekg/dns v1.1.45
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e
 )

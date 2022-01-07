@@ -22,7 +22,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/eqrx/healthcheck/internal/resolve"
+	"dev.eqrx.net/healthcheck/internal/resolve"
 	"github.com/miekg/dns"
 )
 
