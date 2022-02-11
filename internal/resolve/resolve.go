@@ -40,7 +40,7 @@ var errNX = errors.New("dns answer is empty")
 func exchange(ctx context.Context, question *dns.Msg) (dns.RR, error) {
 	response, _, err := (&dns.Client{}).ExchangeContext(ctx, question, DNSServer)
 	if err != nil {
-		return nil, fmt.Errorf("could not request DNS answer: %w", err)
+		return nil, fmt.Errorf("request DNS answer: %w", err)
 	}
 
 	if len(response.Answer) < 1 {

@@ -41,12 +41,12 @@ type Report struct {
 func Check(ctx context.Context) error {
 	out, err := exec.CommandContext(ctx, "ceph", "status", "-f", "json").Output()
 	if err != nil {
-		return fmt.Errorf("could not query ceph for status: %w", err)
+		return fmt.Errorf("query ceph for status: %w", err)
 	}
 
 	var report Report
 	if err := json.Unmarshal(out, &report); err != nil {
-		return fmt.Errorf("could not unmarshal json output of ceph status output: %w", err)
+		return fmt.Errorf("unmarshal json output of ceph status output: %w", err)
 	}
 
 	if report.Health.Status != StatusOK {

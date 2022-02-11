@@ -29,16 +29,16 @@ var errCode = errors.New("ping failed with unexpected code")
 func Send(ctx context.Context, uuid string) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodHead, fmt.Sprintf("https://hc-ping.com/%s", uuid), nil)
 	if err != nil {
-		panic(fmt.Sprintf("could not create request: %v", err))
+		panic(fmt.Sprintf("create request: %v", err))
 	}
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("ping request failed: %w", err)
+		return fmt.Errorf("ping request: %w", err)
 	}
 
 	if err := resp.Body.Close(); err != nil {
-		panic(fmt.Sprintf("could not close body: %v", err))
+		panic(fmt.Sprintf("close body: %v", err))
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {

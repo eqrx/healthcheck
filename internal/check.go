@@ -35,15 +35,15 @@ type (
 func checkConn(ctx context.Context, key string, target string, resolver resolverFn, connector connectorFn) error {
 	_, addr, err := resolver(ctx, target)
 	if err != nil {
-		return fmt.Errorf("resolve failed: %w", err)
+		return fmt.Errorf("resolve: %w", err)
 	}
 
 	if err = connector(ctx, target, addr); err != nil {
-		return fmt.Errorf("connect failed: %w", err)
+		return fmt.Errorf("connect: %w", err)
 	}
 
 	if err := ping.Send(ctx, key); err != nil {
-		return fmt.Errorf("ping failed: %w", err)
+		return fmt.Errorf("ping: %w", err)
 	}
 
 	return nil
@@ -53,11 +53,11 @@ func checkConn(ctx context.Context, key string, target string, resolver resolver
 // If there is a failure at any point, it returns with an error.
 func checkChecker(ctx context.Context, key string, checker func(context.Context) error) error {
 	if err := checker(ctx); err != nil {
-		return fmt.Errorf("check failed: %w", err)
+		return fmt.Errorf("check: %w", err)
 	}
 
 	if err := ping.Send(ctx, key); err != nil {
-		return fmt.Errorf("ping failed: %w", err)
+		return fmt.Errorf("ping: %w", err)
 	}
 
 	return nil

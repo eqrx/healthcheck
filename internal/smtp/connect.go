@@ -38,12 +38,12 @@ func prepareTLS(conn io.ReadWriter) error {
 
 	_, err := conn.Write([]byte("EHLO healthcheck\n"))
 	if err != nil {
-		return fmt.Errorf("coult not write EHLO: %w", err)
+		return fmt.Errorf("write EHLO: %w", err)
 	}
 
 	l, err := reader.ReadString('\n')
 	if err != nil {
-		return fmt.Errorf("coult not read EHLO response: %w", err)
+		return fmt.Errorf("read EHLO response: %w", err)
 	}
 
 	if !strings.HasPrefix(l, "220") {

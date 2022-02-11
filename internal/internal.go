@@ -53,7 +53,7 @@ func Run(ctx context.Context) error {
 	}
 
 	if err != nil {
-		return fmt.Errorf("%s check failed: %w", env.service, err)
+		return fmt.Errorf("%s check: %w", env.service, err)
 	}
 
 	return nil

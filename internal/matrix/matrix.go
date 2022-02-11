@@ -52,12 +52,12 @@ func Connect(ctx context.Context, serverName string, addr string) error {
 
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		panic("could not create request")
+		panic("create request")
 	}
 
 	response, err := httpClient.Do(request)
 	if err != nil {
-		return fmt.Errorf("could not execute http request: %w", err)
+		return fmt.Errorf("execute http request: %w", err)
 	}
 
 	body, readErr := ioutil.ReadAll(response.Body)
@@ -65,11 +65,11 @@ func Connect(ctx context.Context, serverName string, addr string) error {
 
 	switch {
 	case readErr != nil && closeErr != nil:
-		return fmt.Errorf("could not read http body: %w. could also not close it afterwards: %v", readErr, closeErr)
+		return fmt.Errorf("read http body: %w. could also not close it afterwards: %v", readErr, closeErr)
 	case readErr != nil:
-		return fmt.Errorf("could not read http body: %w", readErr)
+		return fmt.Errorf("read http body: %w", readErr)
 	case closeErr != nil:
-		return fmt.Errorf("could not close http response body: %w", closeErr)
+		return fmt.Errorf("close http response body: %w", closeErr)
 	}
 
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
