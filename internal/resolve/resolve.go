@@ -37,7 +37,7 @@ var errNX = errors.New("dns answer is empty")
 
 // exchange asks the given question to the DNS server set in DNSServer and returns the first answer.
 // If there are no answers or something else went wrong this method returns an error.
-func exchange(ctx context.Context, question *dns.Msg) (dns.RR, error) {
+func exchange(ctx context.Context, question *dns.Msg) (dns.RR, error) { //nolint:ireturn
 	response, _, err := (&dns.Client{}).ExchangeContext(ctx, question, DNSServer)
 	if err != nil {
 		return nil, fmt.Errorf("request DNS answer: %w", err)
@@ -58,18 +58,18 @@ func addr(ctx context.Context, name string, port uint16, typ uint16) (string, er
 		return "", err
 	}
 
-	var ip net.IP
+	var resolvedIP net.IP
 
 	switch r := answer.(type) {
 	case *dns.A:
-		ip = r.A
+		resolvedIP = r.A
 	case *dns.AAAA:
-		ip = r.AAAA
+		resolvedIP = r.AAAA
 	default:
 		panic("unexpected dns type")
 	}
 
-	return net.JoinHostPort(ip.String(), fmt.Sprintf("%d", port)), nil
+	return net.JoinHostPort(resolvedIP.String(), fmt.Sprintf("%d", port)), nil
 }
 
 // Pointer resolves a SRV or MX record with the given name and pointerType. It then picks the first answer
@@ -85,13 +85,13 @@ func Pointer(ctx context.Context, name string, pointerType, recordType uint16) (
 
 	var port uint16
 
-	switch r := answer.(type) {
+	switch record := answer.(type) {
 	case *dns.MX:
-		serverName = strings.TrimSuffix(r.Mx, ".")
+		serverName = strings.TrimSuffix(record.Mx, ".")
 		port = MXPort
 	case *dns.SRV:
-		serverName = strings.TrimSuffix(r.Target, ".")
-		port = r.Port
+		serverName = strings.TrimSuffix(record.Target, ".")
+		port = record.Port
 	default:
 		panic("unknown pointer type")
 	}

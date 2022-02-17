@@ -72,18 +72,18 @@ var (
 // readEnv looks up all configuration items and returns them as env instance. If an item is missing it returns and
 // error and no env. Values are not checked for validity here.
 func readEnv() (*env, error) {
-	service, ok := os.LookupEnv(EnvNameService)
-	if !ok {
+	service, serviceOK := os.LookupEnv(EnvNameService)
+	if !serviceOK {
 		return nil, fmt.Errorf("%w: %s", errEnvMissing, EnvNameService)
 	}
 
-	key, ok := os.LookupEnv(EnvNamePing)
-	if !ok {
+	key, keyOK := os.LookupEnv(EnvNamePing)
+	if !keyOK {
 		return nil, fmt.Errorf("%w: %s", errEnvMissing, EnvNamePing)
 	}
 
-	target, ok := os.LookupEnv(EnvNameTarget)
-	if !ok {
+	target, targetOK := os.LookupEnv(EnvNameTarget)
+	if !targetOK {
 		return nil, fmt.Errorf("%w: %s", errEnvMissing, EnvNameTarget)
 	}
 
