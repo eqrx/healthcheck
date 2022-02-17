@@ -1,5 +1,5 @@
-dev.eqrx.net/rungroup v0.0.4 h1:htIRQ88ATo5rLm/tJKnw8LQtPy8qwZiC2M/XCifkFlM=
-dev.eqrx.net/rungroup v0.0.4/go.mod h1:JU/vm7/3v2ehd6UvZPo3O1/rX5hG2f41pWhFAXHSkis=
+dev.eqrx.net/rungroup v0.0.5 h1:fOutPdnEdyCdsZTbD6vcM8KVQCCZPcVAvdYOBHnMrJ0=
+dev.eqrx.net/rungroup v0.0.5/go.mod h1:JU/vm7/3v2ehd6UvZPo3O1/rX5hG2f41pWhFAXHSkis=
 github.com/miekg/dns v1.1.46 h1:uzwpxRtSVxtcIZmz/4Uz6/Rn7G11DvsaslXoy5LxQio=
 github.com/miekg/dns v1.1.46/go.mod h1:e3IlAVfNqAllflbibAZEWOXOQ+Ynzk/dDozDxY7XnME=
 github.com/yuin/goldmark v1.3.5/go.mod h1:mwnBkeHKe2W/ZEtQ+71ViKU8L12m81fl3OWwC1Zlc8k=
