@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	dev.eqrx.net/rungroup v0.0.5
-	github.com/miekg/dns v1.1.46
+	github.com/miekg/dns v1.1.47
 	golang.org/x/sys v0.0.0-20220209214540-3681064d5158
 )
 
