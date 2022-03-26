@@ -11,39 +11,14 @@
 // You should have received a copy of the GNU Affero General Public License along with this program.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Package main provides an entry point to internal.Run.
-package main
+// Package matrix sinks reports to a matrix room.
+package matrix
 
-import (
-	"context"
-	"fmt"
-	"os"
-	"os/signal"
-
-	"eqrx.net/healthcheck/internal"
-	"eqrx.net/service"
-	"golang.org/x/sys/unix"
-)
-
-func main() {
-	service, err := service.New()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "systemd: %v", err)
-		os.Exit(1)
-	}
-
-	log := service.Journal()
-
-	ctx, cancel := signal.NotifyContext(context.Background(), unix.SIGTERM, unix.SIGINT)
-
-	err = internal.Run(ctx, log, service)
-
-	cancel()
-
-	if err != nil {
-		log.Error(err, "main")
-		os.Exit(1)
-	}
-
-	os.Exit(0)
+// Matrix contains the configuration for a matrix room.
+type Matrix struct {
+	HomeServer  string `yaml:"homeServer"`
+	RoomID      string `yaml:"roomId"`
+	DisplayName string `yaml:"displayName"`
+	Token       string `yaml:"token"`
+	lastTxID    uint64 `yaml:"-"`
 }

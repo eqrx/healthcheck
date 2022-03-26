@@ -1,4 +1,4 @@
-// Copyright (C) 2021 Alexander Sowitzki
+// Copyright (C) 2022 Alexander Sowitzki
 //
 // This program is free software: you can redistribute it and/or modify it under the terms of the
 // GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or
@@ -11,8 +11,8 @@
 // You should have received a copy of the GNU Affero General Public License along with this program.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Package ping allows to pick checks of healthchecks.io
-package ping
+// Package hcio sends pings to healthchecks.io.
+package hcio
 
 import (
 	"context"
@@ -21,13 +21,24 @@ import (
 	"net/http"
 )
 
+// Sink sends pings to healthchecks.io.
+type Sink struct {
+	UUID string `yaml:"uuid"`
+}
+
 // errCode is raised when the healthchecks.io call returned an unexpected HTTP status code.
 var errCode = errors.New("ping failed with unexpected code")
 
-// Send performs a HTTP request to the healthchecks.io servers to ping the check identified by the given UUID.
+// Sink performs a HTTP request to the healthchecks.io servers to ping the check identified by the given UUID.
 // It returns nil if the ping was successful.
-func Send(ctx context.Context, uuid string) error {
-	req, err := http.NewRequestWithContext(ctx, http.MethodHead, fmt.Sprintf("https://hc-ping.com/%s", uuid), nil)
+func (s Sink) Sink(ctx context.Context, checkErr error) error {
+	if isOK := checkErr == nil; !isOK {
+		return nil
+	}
+
+	url := "https://hc-ping.com/" + s.UUID
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodHead, url, nil)
 	if err != nil {
 		panic(fmt.Sprintf("create request: %v", err))
 	}

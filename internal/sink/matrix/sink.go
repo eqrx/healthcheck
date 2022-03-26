@@ -11,39 +11,42 @@
 // You should have received a copy of the GNU Affero General Public License along with this program.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Package main provides an entry point to internal.Run.
-package main
+package matrix
 
 import (
 	"context"
 	"fmt"
-	"os"
-	"os/signal"
-
-	"eqrx.net/healthcheck/internal"
-	"eqrx.net/service"
-	"golang.org/x/sys/unix"
 )
 
-func main() {
-	service, err := service.New()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "systemd: %v", err)
-		os.Exit(1)
+// Sink messages into a matrix room. Does lazy deduplication.
+type Sink struct {
+	matrix      *Matrix `yaml:"-"`
+	lastMessage string  `yaml:"-"`
+	name        string  `yaml:"-"`
+}
+
+// Setup the sink with values.
+func (s *Sink) Setup(name string, matrix *Matrix) {
+	s.matrix = matrix
+	s.name = name
+}
+
+// Sink spams messages in a matrix room and talks about received errors.
+func (s *Sink) Sink(ctx context.Context, checkErr error) error {
+	message := s.name + ": OK"
+	if checkErr != nil {
+		message = s.name + ": " + checkErr.Error()
 	}
 
-	log := service.Journal()
-
-	ctx, cancel := signal.NotifyContext(context.Background(), unix.SIGTERM, unix.SIGINT)
-
-	err = internal.Run(ctx, log, service)
-
-	cancel()
-
-	if err != nil {
-		log.Error(err, "main")
-		os.Exit(1)
+	if message == s.lastMessage {
+		return nil
 	}
 
-	os.Exit(0)
+	if err := s.matrix.SendText(ctx, message); err != nil {
+		return fmt.Errorf("send message: %w", err)
+	}
+
+	s.lastMessage = message
+
+	return nil
 }

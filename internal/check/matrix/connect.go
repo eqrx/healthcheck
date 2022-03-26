@@ -11,39 +11,40 @@
 // You should have received a copy of the GNU Affero General Public License along with this program.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Package main provides an entry point to internal.Run.
-package main
+package matrix
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"os"
-	"os/signal"
-
-	"eqrx.net/healthcheck/internal"
-	"eqrx.net/service"
-	"golang.org/x/sys/unix"
+	"net/http"
+	"net/netip"
+	"net/url"
 )
 
-func main() {
-	service, err := service.New()
+var errCode = errors.New("matrix endpoint failed")
+
+// TODO: check tls domain signed.
+func (c Check) connect(ctx context.Context, url url.URL, addr netip.AddrPort) error {
+	httpClient := c.httpClient(addr.String(), url.Host)
+
+	request, err := http.NewRequestWithContext(ctx, http.MethodHead, url.String(), nil)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "systemd: %v", err)
-		os.Exit(1)
+		panic(fmt.Sprintf("create http request: %v", err))
 	}
 
-	log := service.Journal()
-
-	ctx, cancel := signal.NotifyContext(context.Background(), unix.SIGTERM, unix.SIGINT)
-
-	err = internal.Run(ctx, log, service)
-
-	cancel()
-
+	response, err := httpClient.Do(request)
 	if err != nil {
-		log.Error(err, "main")
-		os.Exit(1)
+		return fmt.Errorf("execute http request: %w", err)
 	}
 
-	os.Exit(0)
+	if err := response.Body.Close(); err != nil {
+		return fmt.Errorf("close http response body: %w", err)
+	}
+
+	if response.StatusCode != http.StatusNotFound {
+		return errCode
+	}
+
+	return nil
 }

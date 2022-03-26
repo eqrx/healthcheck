@@ -11,39 +11,36 @@
 // You should have received a copy of the GNU Affero General Public License along with this program.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Package main provides an entry point to internal.Run.
-package main
+package matrix
 
 import (
 	"context"
 	"fmt"
-	"os"
-	"os/signal"
-
-	"eqrx.net/healthcheck/internal"
-	"eqrx.net/service"
-	"golang.org/x/sys/unix"
+	"net/http"
+	"sync/atomic"
 )
 
-func main() {
-	service, err := service.New()
+type message struct {
+	Body    string `json:"body"`
+	MsgType string `json:"msgtype"`
+}
+
+// SendText to the configured room.
+func (m *Matrix) SendText(ctx context.Context, text string) error {
+	txID := fmt.Sprint(atomic.AddUint64(&m.lastTxID, 1))
+	url := m.HomeServer + "/_matrix/client/v3/rooms/" + m.RoomID + "/send/m.room.message/" + txID
+	msg := message{text, "m.text"}
+
+	var response response
+
+	status, err := m.sendHTTP(ctx, &response, msg, http.MethodPut, url)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "systemd: %v", err)
-		os.Exit(1)
+		return err
 	}
 
-	log := service.Journal()
-
-	ctx, cancel := signal.NotifyContext(context.Background(), unix.SIGTERM, unix.SIGINT)
-
-	err = internal.Run(ctx, log, service)
-
-	cancel()
-
-	if err != nil {
-		log.Error(err, "main")
-		os.Exit(1)
+	if err := response.AsError(status); err != nil {
+		return err
 	}
 
-	os.Exit(0)
+	return nil
 }
