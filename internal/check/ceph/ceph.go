@@ -16,11 +16,11 @@ package ceph
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os/exec"
 	"path"
+	"strings"
 
 	"eqrx.net/service"
 	"github.com/go-logr/logr"
@@ -38,13 +38,6 @@ type Check struct {
 	CredsName  string `yaml:"credsName"`
 }
 
-// Report is a representation of the data we are interested in within the JSON output of `ceph status`.
-type Report struct {
-	Health struct {
-		Status string `json:"status"`
-	} `json:"health"`
-}
-
 // Check uses exec to execute the command `ceph status -f json` to get the current status of the cluster that is used
 // by the host healthcheck is running on. If the exec succeeds the output is unmarshalled into Report.  Lastly if the
 // field Report->Health->Status is equal to the constant StatusOK nil is returned.
@@ -54,7 +47,7 @@ func (c Check) Check(ctx context.Context, _ logr.Logger) error {
 		return fmt.Errorf("ceph key ring: %w", err)
 	}
 
-	args := []string{"status", "-f", "json", "-n", c.ClientName, "-k", path.Join(credDir, c.CredsName)}
+	args := []string{"status", "-n", c.ClientName, "-k", path.Join(credDir, c.CredsName)}
 	cmd := exec.CommandContext(ctx, "ceph", args...)
 
 	out, err := cmd.Output()
@@ -62,13 +55,10 @@ func (c Check) Check(ctx context.Context, _ logr.Logger) error {
 		return fmt.Errorf("query ceph for status: %w", err)
 	}
 
-	var report Report
-	if err := json.Unmarshal(out, &report); err != nil {
-		return fmt.Errorf("unmarshal ceph status into json: %w", err)
-	}
+	status := string(out)
 
-	if report.Health.Status != StatusOK {
-		return fmt.Errorf("%w: %v", errStatus, report.Health.Status)
+	if !strings.Contains(status, StatusOK) {
+		return fmt.Errorf("%w: %v", errStatus, status)
 	}
 
 	return nil

@@ -16,9 +16,8 @@ package matrix
 
 // Matrix contains the configuration for a matrix room.
 type Matrix struct {
-	HomeServer  string `yaml:"homeServer"`
-	RoomID      string `yaml:"roomId"`
-	DisplayName string `yaml:"displayName"`
-	Token       string `yaml:"token"`
-	lastTxID    uint64 `yaml:"-"`
+	HomeServer string `yaml:"homeServer"`
+	RoomID     string `yaml:"roomId"`
+	Token      string `yaml:"token"`
+	lastTxID   uint64 `yaml:"-"`
 }
