@@ -24,7 +24,6 @@ import (
 
 var errCode = errors.New("matrix endpoint failed")
 
-// TODO: check tls domain signed.
 func (c Check) connect(ctx context.Context, url url.URL, addr netip.AddrPort) error {
 	httpClient := c.httpClient(addr.String(), url.Host)
 

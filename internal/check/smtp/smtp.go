@@ -50,8 +50,6 @@ func (c *Check) Setup() {
 }
 
 // Check resolves the SMTP of the domain and connects to it via TLS.
-// TODO: DMARC and all the fun stuff.
-// TODO: validate all dns names.
 func (c Check) Check(ctx context.Context, _ logr.Logger) error {
 	addrs, err := c.resolveServer(ctx)
 	if err != nil {
