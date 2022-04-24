@@ -24,7 +24,7 @@ import (
 	"eqrx.net/healthcheck/internal/check/matrix"
 	"eqrx.net/healthcheck/internal/check/smtp"
 	"eqrx.net/healthcheck/internal/sink"
-	matrixsink "eqrx.net/healthcheck/internal/sink/matrix"
+	"eqrx.net/matrix/room"
 	"eqrx.net/rungroup"
 	"github.com/go-logr/logr"
 )
@@ -43,7 +43,7 @@ type Check struct {
 }
 
 // Setup starts the check.
-func (c *Check) Setup(group *rungroup.Group, log logr.Logger, matrix *matrixsink.Matrix) error {
+func (c *Check) Setup(group *rungroup.Group, log logr.Logger, room *room.Room) error {
 	if c.Matrix != nil {
 		if c.checkCB != nil {
 			return errConcrete
@@ -77,7 +77,7 @@ func (c *Check) Setup(group *rungroup.Group, log logr.Logger, matrix *matrixsink
 	}
 
 	for i := range c.Sinks {
-		if err := c.Sinks[i].Setup(c.Name, matrix); err != nil {
+		if err := c.Sinks[i].Setup(c.Name, room); err != nil {
 			return fmt.Errorf("setup sink: %w", err)
 		}
 	}
@@ -117,7 +117,7 @@ func (c Check) poll(ctx context.Context, log logr.Logger, interval time.Duration
 }
 
 func (c Check) check(ctx context.Context, log logr.Logger) error {
-	timeout := c.Interval / 2 //nolint: gomnd
+	timeout := c.Interval / 2
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 
 	defer cancel()
@@ -126,7 +126,7 @@ func (c Check) check(ctx context.Context, log logr.Logger) error {
 }
 
 func (c Check) sink(ctx context.Context, checkErr error) error {
-	timeout := c.Interval / 2 //nolint: gomnd
+	timeout := c.Interval / 2
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 
 	defer cancel()

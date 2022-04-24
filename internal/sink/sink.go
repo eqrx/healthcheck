@@ -11,7 +11,6 @@
 // You should have received a copy of the GNU Affero General Public License along with this program.
 // If not, see <https://www.gnu.org/licenses/>.
 
-// Package sink contain sinks that send results from healthchecks somewhere.
 package sink
 
 import (
@@ -20,6 +19,7 @@ import (
 
 	"eqrx.net/healthcheck/internal/sink/hcio"
 	"eqrx.net/healthcheck/internal/sink/matrix"
+	"eqrx.net/matrix/room"
 )
 
 var errConcrete = errors.New("more or less than one concrete types set for sink")
@@ -32,13 +32,13 @@ type Sink struct {
 }
 
 // Setup the given sink for sending.
-func (s *Sink) Setup(name string, matrix *matrix.Matrix) error {
+func (s *Sink) Setup(name string, room *room.Room) error {
 	if s.Matrix != nil {
 		if s.Sink != nil {
 			return errConcrete
 		}
 
-		s.Matrix.Setup(name, matrix)
+		s.Matrix.Setup(name, room)
 		s.Sink = s.Matrix.Sink
 	}
 

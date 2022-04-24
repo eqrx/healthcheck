@@ -31,7 +31,6 @@ linters:
     - gofumpt
     - goheader
     - goimports
-    - gomnd
     - gomoddirectives
     - gomodguard
     - goprintffuncname
@@ -86,6 +85,7 @@ linters:
     - wsl
     # - exhaustivestruct # Not for general usage.
     # - golint # Deprecated.
+    # - gomnd
     # - interfacer # Deprecated.
     # - maligned # Deprecated.
     # - scopelint # Deprecated.

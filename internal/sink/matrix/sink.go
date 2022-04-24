@@ -16,18 +16,20 @@ package matrix
 import (
 	"context"
 	"fmt"
+
+	"eqrx.net/matrix/room"
 )
 
 // Sink messages into a matrix room. Does lazy deduplication.
 type Sink struct {
-	matrix      *Matrix `yaml:"-"`
-	lastMessage string  `yaml:"-"`
-	name        string  `yaml:"-"`
+	room        *room.Room `yaml:"-"`
+	lastMessage string     `yaml:"-"`
+	name        string     `yaml:"-"`
 }
 
 // Setup the sink with values.
-func (s *Sink) Setup(name string, matrix *Matrix) {
-	s.matrix = matrix
+func (s *Sink) Setup(name string, room *room.Room) {
+	s.room = room
 	s.name = name
 }
 
@@ -42,7 +44,7 @@ func (s *Sink) Sink(ctx context.Context, checkErr error) error {
 		return nil
 	}
 
-	if err := s.matrix.SendText(ctx, message); err != nil {
+	if err := s.room.SendMessage(ctx, message); err != nil {
 		return fmt.Errorf("send message: %w", err)
 	}
 

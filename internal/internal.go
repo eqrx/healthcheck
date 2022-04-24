@@ -19,7 +19,8 @@ import (
 	"fmt"
 
 	"eqrx.net/healthcheck/internal/check"
-	"eqrx.net/healthcheck/internal/sink/matrix"
+	"eqrx.net/matrix"
+	"eqrx.net/matrix/room"
 	"eqrx.net/rungroup"
 	"eqrx.net/service"
 	"github.com/go-logr/logr"
@@ -27,22 +28,32 @@ import (
 
 const confCredName = "healthcheck"
 
+// MatrixConf defines in which matrix room messages should be sent.
+type MatrixConf struct {
+	Homeserver string `json:"homeserver"`
+	Token      string `json:"token"`
+	Room       string `json:"room"`
+}
+
 // Conf defines checks and sinks.
 type Conf struct {
 	Checks []check.Check `yaml:"checks"`
-	Matrix matrix.Matrix `yaml:"matrix"`
+	Matrix MatrixConf    `yaml:"matrix"`
 }
 
 // Run loads checks and starts them.
 func (c Conf) Run(ctx context.Context, log logr.Logger, service *service.Service) error {
-	if err := c.Matrix.Setup(ctx); err != nil {
-		return fmt.Errorf("matrix: %w", err)
+	matrix := matrix.New(c.Matrix.Homeserver, c.Matrix.Token)
+	room := room.New(matrix, c.Matrix.Room)
+
+	if err := room.Join(ctx); err != nil {
+		return fmt.Errorf("matrix room join: %w", err)
 	}
 
 	group := rungroup.New(ctx)
 
 	for i := range c.Checks {
-		if err := c.Checks[i].Setup(group, log, &c.Matrix); err != nil {
+		if err := c.Checks[i].Setup(group, log, room); err != nil {
 			return fmt.Errorf("check %s setup: %w", c.Checks[i].Name, err)
 		}
 	}
