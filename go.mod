@@ -5,7 +5,7 @@ go 1.18
 require (
 	eqrx.net/matrix v0.0.2
 	eqrx.net/rungroup v0.0.8
-	eqrx.net/service v0.0.2
+	eqrx.net/service v0.0.3
 	github.com/go-logr/logr v1.2.3
 	github.com/miekg/dns v1.1.48
 	golang.org/x/sys v0.0.0-20220422013727-9388b58f7150
