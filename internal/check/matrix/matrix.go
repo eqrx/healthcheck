@@ -16,7 +16,6 @@ package matrix
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -32,14 +31,11 @@ import (
 // StatusOK is the value that synapse reports as health status when everything is good.
 const StatusOK = "OK"
 
-var errNX = errors.New("addr not found")
-
 type target struct {
 	url  url.URL
 	addr netip.AddrPort
 }
 
-//nolint:tagliatelle
 type wellKnown struct {
 	Homeserver struct {
 		URL string `json:"base_url"`
@@ -133,7 +129,7 @@ func (c Check) httpClient(toAddr, fromAddr string) *http.Client {
 				panic(fmt.Sprintf("expected to be called with %s, got %s", fromAddr, actual))
 			}
 
-			return (&net.Dialer{}).DialContext(ctx, network, toAddr) //nolint:wrapcheck
+			return (&net.Dialer{}).DialContext(ctx, network, toAddr)
 		},
 	}
 

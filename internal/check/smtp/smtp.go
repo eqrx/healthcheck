@@ -16,7 +16,6 @@ package smtp
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net"
 
@@ -24,8 +23,6 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/miekg/dns"
 )
-
-var errNX = errors.New("no servers defined for addr")
 
 // Check resolves an SMTP server and tess it TLS function.
 type Check struct {
@@ -57,7 +54,7 @@ func (c Check) Check(ctx context.Context, _ logr.Logger) error {
 	}
 
 	if len(addrs) == 0 {
-		return fmt.Errorf("smtp check: %w", errNX)
+		return fmt.Errorf("smtp check: no servers defined for addr")
 	}
 
 	group := rungroup.New(ctx)

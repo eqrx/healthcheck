@@ -15,14 +15,11 @@ package matrix
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/netip"
 	"net/url"
 )
-
-var errCode = errors.New("matrix endpoint failed")
 
 func (c Check) connect(ctx context.Context, url url.URL, addr netip.AddrPort) error {
 	httpClient := c.httpClient(addr.String(), url.Host)
@@ -42,7 +39,7 @@ func (c Check) connect(ctx context.Context, url url.URL, addr netip.AddrPort) er
 	}
 
 	if response.StatusCode != http.StatusNotFound {
-		return errCode
+		return fmt.Errorf("matrix endpoint failed")
 	}
 
 	return nil

@@ -17,52 +17,34 @@ package internal
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"eqrx.net/healthcheck/internal/check"
-	"eqrx.net/matrix"
-	"eqrx.net/matrix/room"
 	"eqrx.net/rungroup"
 	"eqrx.net/service"
 	"github.com/go-logr/logr"
+	"gopkg.in/yaml.v3"
 )
 
-const confCredName = "healthcheck"
-
-// MatrixConf defines in which matrix room messages should be sent.
-type MatrixConf struct {
-	Homeserver string `json:"homeserver"`
-	Token      string `json:"token"`
-	Room       string `json:"room"`
-}
+// ConfigPath defines from where the configuration file is loaded.
+const ConfigPath = "/etc/healthcheck/conf"
 
 // Conf defines checks and sinks.
 type Conf struct {
 	Checks []check.Check `yaml:"checks"`
-	Matrix MatrixConf    `yaml:"matrix"`
 }
 
 // Run loads checks and starts them.
-func (c Conf) Run(ctx context.Context, log logr.Logger, service *service.Service) error {
-	matrix := matrix.New(c.Matrix.Homeserver, c.Matrix.Token)
-	room := room.New(matrix, c.Matrix.Room)
-
-	if err := room.Join(ctx); err != nil {
-		return fmt.Errorf("matrix room join: %w", err)
-	}
-
+func (c Conf) Run(ctx context.Context, log logr.Logger, service service.Service) error {
 	group := rungroup.New(ctx)
 
 	for i := range c.Checks {
-		if err := c.Checks[i].Setup(group, log, room); err != nil {
+		if err := c.Checks[i].Setup(ctx, group, log); err != nil {
 			return fmt.Errorf("check %s setup: %w", c.Checks[i].Name, err)
 		}
 	}
 
-	if err := service.MarkReady(); err != nil {
-		return fmt.Errorf("systemd notify: %w", err)
-	}
-
-	defer func() { _ = service.MarkStopping() }()
+	group.Go(service.RunNotify)
 
 	if err := group.Wait(); err != nil {
 		return fmt.Errorf("checks: %w", err)
@@ -72,10 +54,16 @@ func (c Conf) Run(ctx context.Context, log logr.Logger, service *service.Service
 }
 
 // Run unmarshals Conf from systemd credentials and calls the Run method on it.
-func Run(ctx context.Context, log logr.Logger, service *service.Service) error {
+func Run(ctx context.Context, log logr.Logger, service service.Service) error {
 	var conf Conf
-	if err := service.UnmarshalYAMLCreds(&conf, confCredName); err != nil {
-		return fmt.Errorf("load config: %w", err)
+
+	confBytes, err := os.ReadFile(ConfigPath)
+	if err != nil {
+		return err
+	}
+
+	if err := yaml.Unmarshal(confBytes, &conf); err != nil {
+		return err
 	}
 
 	return conf.Run(ctx, log, service)

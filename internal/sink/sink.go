@@ -18,27 +18,29 @@ import (
 	"errors"
 
 	"eqrx.net/healthcheck/internal/sink/hcio"
-	"eqrx.net/healthcheck/internal/sink/matrix"
-	"eqrx.net/matrix/room"
+	matrixsink "eqrx.net/healthcheck/internal/sink/matrix"
 )
 
 var errConcrete = errors.New("more or less than one concrete types set for sink")
 
 // Sink contains concrete sink implementations.
 type Sink struct {
-	Matrix *matrix.Sink                       `yaml:"matrix"`
+	Matrix *matrixsink.Sink                   `yaml:"matrix"`
 	HCIO   *hcio.Sink                         `yaml:"hcio"`
 	Sink   func(context.Context, error) error `yaml:"-"`
 }
 
 // Setup the given sink for sending.
-func (s *Sink) Setup(name string, room *room.Room) error {
+func (s *Sink) Setup(ctx context.Context, name string) error {
 	if s.Matrix != nil {
 		if s.Sink != nil {
 			return errConcrete
 		}
 
-		s.Matrix.Setup(name, room)
+		if err := s.Matrix.Setup(ctx, name); err != nil {
+			return err
+		}
+
 		s.Sink = s.Matrix.Sink
 	}
 

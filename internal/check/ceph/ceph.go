@@ -16,7 +16,6 @@ package ceph
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os/exec"
 	"path"
@@ -28,9 +27,6 @@ import (
 
 // StatusOK is the value that ceph reports as health status when everything is good.
 const StatusOK = "HEALTH_OK"
-
-// errStatus is raised if ceph report any other status than statusOK.
-var errStatus = errors.New("ceph reports unhealthy")
 
 // Check for the status of a ceph cluster.
 type Check struct {
@@ -58,7 +54,7 @@ func (c Check) Check(ctx context.Context, _ logr.Logger) error {
 	status := string(out)
 
 	if !strings.Contains(status, StatusOK) {
-		return fmt.Errorf("%w: %v", errStatus, status)
+		return fmt.Errorf("ceph reports unhealthy: %v", status)
 	}
 
 	return nil

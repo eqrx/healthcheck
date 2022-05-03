@@ -16,7 +16,6 @@ package matrix
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -24,8 +23,6 @@ import (
 	"net/url"
 	"strconv"
 )
-
-var errHTTPResponse = errors.New("unexpected http response status")
 
 func (c Check) resolveWellKnownTargets(ctx context.Context) ([]target, error) {
 	requestURL := "https://" + c.Domain + "/.well-known/matrix/client"
@@ -36,7 +33,7 @@ func (c Check) resolveWellKnownTargets(ctx context.Context) ([]target, error) {
 	}
 
 	if len(addrs) == 0 {
-		return nil, errNX
+		return nil, fmt.Errorf("addr not found")
 	}
 
 	targets := []target{}
@@ -51,7 +48,7 @@ func (c Check) resolveWellKnownTargets(ctx context.Context) ([]target, error) {
 	}
 
 	if len(targets) == 0 {
-		return nil, errNX
+		return nil, fmt.Errorf("addr not found")
 	}
 
 	return targets, nil
@@ -118,7 +115,7 @@ func (c Check) loadHTTP(ctx context.Context, url, hostPort, ipPort string, dst i
 	case closeErr != nil:
 		return fmt.Errorf("close body: %w", closeErr)
 	case response.StatusCode < 200 || response.StatusCode >= 300:
-		return fmt.Errorf("%w: %v", errHTTPResponse, response.StatusCode)
+		return fmt.Errorf("unexpected http response status: %v", response.StatusCode)
 	default:
 		return nil
 	}

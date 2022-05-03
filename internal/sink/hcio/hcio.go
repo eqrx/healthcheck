@@ -16,7 +16,6 @@ package hcio
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 )
@@ -25,9 +24,6 @@ import (
 type Sink struct {
 	UUID string `yaml:"uuid"`
 }
-
-// errCode is raised when the healthchecks.io call returned an unexpected HTTP status code.
-var errCode = errors.New("ping failed with unexpected code")
 
 // Sink performs a HTTP request to the healthchecks.io servers to ping the check identified by the given UUID.
 // It returns nil if the ping was successful.
@@ -53,7 +49,7 @@ func (s Sink) Sink(ctx context.Context, checkErr error) error {
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("%w: %v", errCode, resp.Status)
+		return fmt.Errorf("ping failed with unexpected code: %v", resp.Status)
 	}
 
 	return nil

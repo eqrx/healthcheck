@@ -16,24 +16,20 @@ package check
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
 	"eqrx.net/healthcheck/internal/check/ceph"
-	"eqrx.net/healthcheck/internal/check/matrix"
+	matrixcheck "eqrx.net/healthcheck/internal/check/matrix"
 	"eqrx.net/healthcheck/internal/check/smtp"
 	"eqrx.net/healthcheck/internal/sink"
-	"eqrx.net/matrix/room"
 	"eqrx.net/rungroup"
 	"github.com/go-logr/logr"
 )
 
-var errConcrete = errors.New("more or less than one concrete types set for check")
-
 // Check contains concrete check implementations.
 type Check struct {
-	Matrix   *matrix.Check                            `yaml:"matrix"`
+	Matrix   *matrixcheck.Check                       `yaml:"matrix"`
 	SMTP     *smtp.Check                              `yaml:"smtp"`
 	Ceph     *ceph.Check                              `yaml:"ceph"`
 	Sinks    []sink.Sink                              `yaml:"sinks"`
@@ -43,10 +39,10 @@ type Check struct {
 }
 
 // Setup starts the check.
-func (c *Check) Setup(group *rungroup.Group, log logr.Logger, room *room.Room) error {
+func (c *Check) Setup(ctx context.Context, group *rungroup.Group, log logr.Logger) error {
 	if c.Matrix != nil {
 		if c.checkCB != nil {
-			return errConcrete
+			return fmt.Errorf("more or less than one concrete types set for check")
 		}
 
 		c.Matrix.Setup()
@@ -56,7 +52,7 @@ func (c *Check) Setup(group *rungroup.Group, log logr.Logger, room *room.Room) e
 
 	if c.SMTP != nil {
 		if c.checkCB != nil {
-			return errConcrete
+			return fmt.Errorf("more or less than one concrete types set for check")
 		}
 
 		c.SMTP.Setup()
@@ -66,18 +62,18 @@ func (c *Check) Setup(group *rungroup.Group, log logr.Logger, room *room.Room) e
 
 	if c.Ceph != nil {
 		if c.checkCB != nil {
-			return errConcrete
+			return fmt.Errorf("more or less than one concrete types set for check")
 		}
 
 		c.checkCB = c.Ceph.Check
 	}
 
 	if c.checkCB == nil {
-		return errConcrete
+		return fmt.Errorf("more or less than one concrete types set for check")
 	}
 
 	for i := range c.Sinks {
-		if err := c.Sinks[i].Setup(c.Name, room); err != nil {
+		if err := c.Sinks[i].Setup(ctx, c.Name); err != nil {
 			return fmt.Errorf("setup sink: %w", err)
 		}
 	}
@@ -136,9 +132,7 @@ func (c Check) sink(ctx context.Context, checkErr error) error {
 	for i := range c.Sinks {
 		sink := &c.Sinks[i]
 
-		group.Go(func(ctx context.Context) error {
-			return sink.Sink(ctx, checkErr) //nolint:wrapcheck
-		}, rungroup.NeverCancel)
+		group.Go(func(ctx context.Context) error { return sink.Sink(ctx, checkErr) }, rungroup.NeverCancel)
 	}
 
 	if err := group.Wait(); err != nil {

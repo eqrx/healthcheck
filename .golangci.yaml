@@ -26,7 +26,6 @@ linters:
     - gocritic
     - gocyclo
     - godot
-    - goerr113
     - gofmt
     - gofumpt
     - goheader
@@ -74,21 +73,22 @@ linters:
     - varnamelen
     - wastedassign
     - whitespace
-    - wrapcheck
     - errname
     - exhaustive
     - forbidigo
     - goconst
     - godox
     - promlinter
-    - tagliatelle
     - wsl
     # - exhaustivestruct # Not for general usage.
+    # - goerr113
     # - golint # Deprecated.
     # - gomnd
     # - interfacer # Deprecated.
     # - maligned # Deprecated.
     # - scopelint # Deprecated.
+    # - tagliatelle
+    # - wrapcheck
 issues:
   max-same-issues: 0
   max-issues-per-linter: 0

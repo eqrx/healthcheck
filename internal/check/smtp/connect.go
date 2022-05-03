@@ -26,9 +26,6 @@ import (
 	"eqrx.net/rungroup"
 )
 
-// errProtocol indicates the server did not adhere to the SMTP protocol.
-var errProtocol = errors.New("protocol failure")
-
 // prepareTLS exchanges messages required by the SMTP protocol to enable STARTTLS.
 func prepareTLS(conn io.ReadWriter) error {
 	reader := bufio.NewReader(conn)
@@ -44,7 +41,7 @@ func prepareTLS(conn io.ReadWriter) error {
 	}
 
 	if !strings.HasPrefix(l, "220") {
-		return fmt.Errorf("connect: prepare TLS: %w: server didn't like EHLO", errProtocol)
+		return fmt.Errorf("connect: prepare TLS: protocol failure: server didn't like EHLO")
 	}
 
 	_, err = conn.Write([]byte("STARTTLS\n"))

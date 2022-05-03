@@ -15,7 +15,6 @@ package matrix
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/netip"
 	"net/url"
@@ -26,8 +25,6 @@ import (
 // dnsServer defines the port and address from which to query DNS records.
 // Set to cloudflare DNS to avoid as much record caching as possible.
 const dnsServer = "[2606:4700:4700::1111]:53"
-
-var errAnswerType = errors.New("answer type not matching request")
 
 func (c Check) resolveSRVTargets(ctx context.Context) ([]target, error) {
 	question := (&dns.Msg{}).SetQuestion("_matrix._tcp."+c.Domain+".", dns.TypeSRV)
@@ -42,7 +39,7 @@ func (c Check) resolveSRVTargets(ctx context.Context) ([]target, error) {
 	for i := range answer.Answer {
 		srvRecord, ok := answer.Answer[i].(*dns.SRV)
 		if !ok {
-			return nil, fmt.Errorf("%w: exptected SRV, got %T", errAnswerType, answer.Answer[i])
+			return nil, fmt.Errorf("answer type not matching request: exptected SRV, got %T", answer.Answer[i])
 		}
 
 		addrs, err := c.resolveAddr(ctx, srvRecord.Target)
@@ -61,7 +58,7 @@ func (c Check) resolveSRVTargets(ctx context.Context) ([]target, error) {
 	}
 
 	if len(targets) == 0 {
-		return nil, errNX
+		return nil, fmt.Errorf("addr not found")
 	}
 
 	return targets, nil
