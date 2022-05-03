@@ -1,7 +1,7 @@
 eqrx.net/journalr v0.0.1 h1:xT7T1lhwOk5hPa3OEviFx/AlitRydQSW08vB6qOxIkY=
 eqrx.net/journalr v0.0.1/go.mod h1:6cLBtbD1FOUC9yci07L38/mUB3rSdsXpWEF8vra9YS4=
-eqrx.net/matrix v0.0.3 h1:oDv0XQxBX3PPrOCI81Ly7UWBSY/DxqJ/+9fFdkT0Uf4=
-eqrx.net/matrix v0.0.3/go.mod h1:lG6E3ODFrATHYL7g4ax0pGexukbT9Va99auPzkJIfcw=
+eqrx.net/matrix v0.0.4 h1:hUYXG5EM0YwFdsWBsIz0irkDfXhIqQ5+ZA+VDPZX++w=
+eqrx.net/matrix v0.0.4/go.mod h1:lG6E3ODFrATHYL7g4ax0pGexukbT9Va99auPzkJIfcw=
 eqrx.net/rungroup v0.0.9 h1:krC0XnAalnv8ERFdXow0JkW3gw35FzyoIbQLY/SLeCQ=
 eqrx.net/rungroup v0.0.9/go.mod h1:OkhrVLfjVZOtC3Q1gaFprfKVIogC4M4jLnrI31EyKHc=
 eqrx.net/service v0.0.4 h1:WxSisfVDc38ffuaC2NC8xUi61rImmEEGfjtVdPPhy4k=

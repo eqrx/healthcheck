@@ -3,7 +3,7 @@ module eqrx.net/healthcheck
 go 1.18
 
 require (
-	eqrx.net/matrix v0.0.3
+	eqrx.net/matrix v0.0.4
 	eqrx.net/rungroup v0.0.9
 	eqrx.net/service v0.0.4
 	github.com/go-logr/logr v1.2.3
