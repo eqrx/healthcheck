@@ -16,8 +16,6 @@ package matrix
 import (
 	"context"
 	"fmt"
-	"sync/atomic"
-	"time"
 
 	"eqrx.net/matrix"
 	"eqrx.net/matrix/room"
@@ -41,7 +39,7 @@ type Sink struct {
 	name        string        `yaml:"-"`
 }
 
-var txID = time.Now().UnixMilli() //nolint:gochecknoglobals
+var txID = matrix.NewTXIDGen() //nolint:gochecknoglobals
 
 // Setup the sink with values.
 func (s *Sink) Setup(ctx context.Context, name string) error {
@@ -79,8 +77,7 @@ func (s *Sink) Sink(ctx context.Context, checkErr error) error {
 	}
 
 	for _, roomID := range s.rooms {
-		txID := fmt.Sprint(atomic.AddInt64(&txID, 1))
-		if _, err := room.NewTextMessage(roomID, message).Send(ctx, s.matrix, txID); err != nil {
+		if _, err := room.NewTextMessage(roomID, message).Send(ctx, s.matrix, txID.NextTXID()); err != nil {
 			return fmt.Errorf("send message: %w", err)
 		}
 	}
