@@ -39,8 +39,6 @@ type Sink struct {
 	name        string        `yaml:"-"`
 }
 
-var txID = matrix.NewTXIDGen() //nolint:gochecknoglobals
-
 // Setup the sink with values.
 func (s *Sink) Setup(ctx context.Context, name string) error {
 	var creds Credentials
@@ -77,7 +75,7 @@ func (s *Sink) Sink(ctx context.Context, checkErr error) error {
 	}
 
 	for _, roomID := range s.rooms {
-		if _, err := room.NewTextMessage(roomID, message).Send(ctx, s.matrix, txID.NextTXID()); err != nil {
+		if _, err := room.NewTextMessage(roomID, message).Send(ctx, s.matrix); err != nil {
 			return fmt.Errorf("send message: %w", err)
 		}
 	}
