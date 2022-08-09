@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	eqrx.net/matrix v0.0.6
-	eqrx.net/rungroup v0.0.9
+	eqrx.net/rungroup v0.0.10
 	eqrx.net/service v0.0.4
 	github.com/go-logr/logr v1.2.3
 	github.com/miekg/dns v1.1.50
@@ -14,6 +14,7 @@ require (
 
 require (
 	eqrx.net/journalr v0.0.1 // indirect
+	github.com/magefile/mage v1.13.0 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4 // indirect
 	golang.org/x/tools v0.1.10 // indirect
